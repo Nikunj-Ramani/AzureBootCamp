@@ -1,9 +1,9 @@
 New-AzVm `
--ResourceGroupName test-win-2016 `
--Name test-win-01 `
--Location West US `
--VirtualNetworkName Nikunj-vnet `
--SubnetName "mySubnet" `
+-ResourceGroupName "Nikunj_RG" `
+-Name "test-win-01" `
+-Location "West US" `
+-VirtualNetworkName "Nikunj-vnet" `
+-SubnetName "subnet2" `
 -SecurityGroupName test-win-2016-nsg `
 -PublicIpAddressName test-win-2016-ip `
 -OpenPorts 80,3389
@@ -11,18 +11,37 @@ New-AzVm `
 #####
 # Execute on Powershell
 
-PS /home/nikunj> New-AzVm `
->> -ResourceGroupName "Nikunj_test_RG" `
->> -Name "test-win-01" `
->> -Location "West US" `
->> -VirtualNetworkName "Nikunj-vnet" `
->> -SubnetName "default" `
->> -SecurityGroupName "test-win-2016-nsg" `
->> -PublicIpAddressName "test-win-2016-ip" `
->> -OpenPorts 80,3389
+1. try first
+
+PS /home/nikunj> New-AzVm `>>  -ResourceGroupName "Nikunj_RG" `>>  -Name "test-win-01" `>>  -Location "WEST US" `>>  -VirtualNetworkName "Nikunj-vnet" `>>  -SubnetName "subnet2" `>>  -SecurityGroupName "win-VM-nsg" `
+>>  -PublicIpAddressName "win1-VM-ip" `
+>>  -OpenPorts 80,3389
 
 cmdlet New-AzVM at command pipeline position 1
 Supply values for the following parameters:
 Credential
 User: nikunj.ramani@globant.com
 Password for user nikunj.ramani@globant.com: ************
+
+New-AzVM: The requested size for resource '/subscriptions/13d5fe96-72a6-4494-b3c9-b75dcc19ee1b/resourceGroups/Nikunj_RG/providers/Microsoft.Compute/virtualMachines/test
+-win-01' is currently not available in location 'WEST US' zones '' for subscription '13d5fe96-72a6-4494-b3c9-b75dcc19ee1b'. Please try another size or deploy to a diffe
+rent location or zones. See https://aka.ms/azureskunotavailable for details.
+
+2. try second
+
+PS /home/nikunj> New-AzVm `
+>>  -ResourceGroupName "Nikunj_RG" `
+>>  -VM "Standard_A0" `
+>>  -Name "test-win-01" `
+>>  -Location "WEST US" `
+>>  -VirtualNetworkName "Nikunj-vnet" `
+>>  -SubnetName "subnet2" `
+>>  -SecurityGroupName "win-VM-nsg" `
+>>  -PublicIpAddressName "win1-VM-ip" `
+>>  -OpenPorts 80,3389
+New-AzVM:
+Line |
+   3 |   -VM "Standard_A0" `
+     |       ~~~~~~~~~~~~~
+     | Cannot bind parameter 'VM'. Cannot convert the "Standard_A0" value of type "System.String" to type "Microsoft.Azure.Commands.Compute.Models.PSVirtualMachine".
+     
