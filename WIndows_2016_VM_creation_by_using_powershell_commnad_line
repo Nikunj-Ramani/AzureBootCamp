@@ -7,3 +7,22 @@ New-AzVm `
 -SecurityGroupName test-win-2016-nsg `
 -PublicIpAddressName test-win-2016-ip `
 -OpenPorts 80,3389
+
+#####
+# Execute on Powershell
+
+PS /home/nikunj> New-AzVm `
+>> -ResourceGroupName "Nikunj_test_RG" `
+>> -Name "test-win-01" `
+>> -Location "West US" `
+>> -VirtualNetworkName "Nikunj-vnet" `
+>> -SubnetName "default" `
+>> -SecurityGroupName "test-win-2016-nsg" `
+>> -PublicIpAddressName "test-win-2016-ip" `
+>> -OpenPorts 80,3389
+
+cmdlet New-AzVM at command pipeline position 1
+Supply values for the following parameters:
+Credential
+User: nikunj.ramani@globant.com
+Password for user nikunj.ramani@globant.com: ************
