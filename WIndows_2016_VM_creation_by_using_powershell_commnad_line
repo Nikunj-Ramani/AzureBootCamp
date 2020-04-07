@@ -1,0 +1,9 @@
+New-AzVm `
+-ResourceGroupName test-win-2016 `
+-Name test-win-01 `
+-Location West US `
+-VirtualNetworkName Nikunj-vnet `
+-SubnetName "mySubnet" `
+-SecurityGroupName test-win-2016-nsg `
+-PublicIpAddressName test-win-2016-ip `
+-OpenPorts 80,3389
