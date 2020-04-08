@@ -3,8 +3,9 @@ $resourceGroup = "Nikunj_RG"
 $location = "westus"
 $vmName = "test-win-01"
 $vnet = "Nikunj-vnet"
+$network_range = "192.168.0.0/16"
 $subnet_range = "192.168.1.0/24"
-$SubnetName = "mySubnet"
+$SubnetName = "subnet1"
 $AllocationMethod = "Static" 
 $IdleTimeoutInMinutes = 4
 $myNetworkSecurityGroupRuleRDP = "myNetworkSecurityGroupRuleRDP"
@@ -32,7 +33,7 @@ $subnetConfig = New-AzVirtualNetworkSubnetConfig -Name $SubnetName -AddressPrefi
 
 # Create a virtual network
 $vnet = New-AzVirtualNetwork -ResourceGroupName $resourceGroup -Location $location `
-  -Name MYvNET -AddressPrefix 192.168.0.0/16 -Subnet $subnetConfig
+  -Name $vnet -AddressPrefix $network_range -Subnet $subnetConfig
 
 # Create a public IP address and specify a DNS name
 $pip = New-AzPublicIpAddress -ResourceGroupName $resourceGroup -Location $location `
