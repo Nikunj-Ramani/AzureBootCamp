@@ -2,7 +2,7 @@
 $resourceGroup = "Nikunj_RG"
 $location = "westus"
 $vmName = "test-win-01"
-$vnet = "Nikunj-vnet"
+$virtual_net = "Nikunj-vnet"
 $network_range = "192.168.0.0/16"
 $subnet_range = "192.168.1.0/24"
 $SubnetName = "subnet1"
@@ -33,7 +33,7 @@ $subnetConfig = New-AzVirtualNetworkSubnetConfig -Name $SubnetName -AddressPrefi
 
 # Create a virtual network
 $vnet = New-AzVirtualNetwork -ResourceGroupName $resourceGroup -Location $location `
-  -Name $vnet -AddressPrefix $network_range -Subnet $subnetConfig
+  -Name $virtual_net -AddressPrefix $network_range -Subnet $subnetConfig
 
 # Create a public IP address and specify a DNS name
 $pip = New-AzPublicIpAddress -ResourceGroupName $resourceGroup -Location $location `
