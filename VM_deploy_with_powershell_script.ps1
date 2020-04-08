@@ -50,7 +50,7 @@ $nsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Location $l
 
 # Create a virtual network card and associate with public IP address and NSG
 $nic = New-AzNetworkInterface -Name $NIC_name -ResourceGroupName $resourceGroup -Location $location `
-  -SubnetId $vnet.SubnetName.Id -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.Id
+  -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.Id
 
 # Create a virtual machine configuration
 $vmConfig = New-AzVMConfig -VMName $vmName -VMSize $VMSize | `
