@@ -1,5 +1,5 @@
 # Variables for common values
-$resourceGroup = "Nikunj_RG"
+$resourceGroup = "Nikunj-test_RG"
 $location = "westus"
 $vmName = "test-win-01"
 $virtual_net = "Nikunj-vnet"
