@@ -2,7 +2,7 @@
 $resourceGroup = "Nikunj_RG"
 $location = "westus"
 $vmName = "test-win-01"
-$subnet = "192.168.1.0/24"
+$subnet_range = "192.168.1.0/24"
 $SubnetName = "mySubnet"
 $AllocationMethod = "Static" 
 $IdleTimeoutInMinutes = 4
@@ -27,7 +27,7 @@ $cred = Get-Credential -Message "Enter a username and password for the virtual m
 New-AzResourceGroup -Name $resourceGroup -Location $location
 
 # Create a subnet configuration
-$subnetConfig = New-AzVirtualNetworkSubnetConfig -Name $SubnetName -AddressPrefix $subnet
+$subnetConfig = New-AzVirtualNetworkSubnetConfig -Name $SubnetName -AddressPrefix $subnet_range
 
 # Create a virtual network
 $vnet = New-AzVirtualNetwork -ResourceGroupName $resourceGroup -Location $location `
