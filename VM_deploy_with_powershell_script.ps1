@@ -2,6 +2,7 @@
 $resourceGroup = "Nikunj_RG"
 $location = "westus"
 $vmName = "test-win-01"
+$vnet = "Nikunj-vnet"
 $subnet_range = "192.168.1.0/24"
 $SubnetName = "mySubnet"
 $AllocationMethod = "Static" 
