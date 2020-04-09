@@ -96,7 +96,7 @@
     "publicIPAddressName": "Nikunj-PublicIP",
     "numberOfInstances": 1,
     "storageAccountName": "NikunjSA",
-    "networkSecurityGroupName": "NikunjNSG')]"
+    "networkSecurityGroupName": "Nikunj-NSG"
   },
   "resources": [
     {
