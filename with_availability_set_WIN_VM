@@ -102,12 +102,13 @@
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), variables ('subnetName'))]",
     "publicIPAddressName": "Nikunj-PublicIP",
     "numberOfInstances": 1,
+    "storageAccountName": "[uniqueString(resourceGroup().id)]",
     "networkSecurityGroupName": "Nikunj-NSG"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('storageAccountName')]",
+      "name": "[variables('storageAccountName')]",
       "apiVersion": "2015-05-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
@@ -215,7 +216,7 @@
       },
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', parameters('nicNamePrefix'), copyindex())]",
         "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
       ],
@@ -252,7 +253,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": true,
-            "storageUri": "[reference(parameters('storageAccountName'), '2018-02-01').primaryEndpoints.blob]"
+            "storageUri": "[reference(variables('storageAccountName'), '2018-02-01').primaryEndpoints.blob]"
           }
         }
       }
