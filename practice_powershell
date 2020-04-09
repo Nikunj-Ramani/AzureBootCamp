@@ -1,0 +1,118 @@
+New-AzStorageAccount
+   [-ResourceGroupName] <String>
+   [-Name] <String>
+   [-SkuName] <String>
+   [-Location] <String>
+   [-Kind <String>]
+   [-AccessTier <String>]
+   [-CustomDomainName <String>]
+   [-UseSubDomain <Boolean>]
+   [-Tag <Hashtable>]
+   [-EnableHttpsTrafficOnly <Boolean>]
+   [-AssignIdentity]
+   [-NetworkRuleSet <PSNetworkRuleSet>]
+   [-EnableHierarchicalNamespace <Boolean>]
+   [-EnableAzureActiveDirectoryDomainServicesForFile <Boolean>]
+   [-EnableLargeFileShare]
+   [-AsJob]
+   [-EncryptionKeyTypeForTable <String>]
+   [-EncryptionKeyTypeForQueue <String>]
+   [-DefaultProfile <IAzureContextContainer>]
+   [<CommonParameters>]
+   
+   
+   
+####
+
+New-AzStorageAccount -ResourceGroupName $ResourceGroupName `
+   -Name $Name `
+   -SkuName $SkuName `
+   -Location $Location
+   -Kind $Kind `
+   -AccessTier $AccessTier ` 
+   -CustomDomainName $CustomDomainName `
+   [-UseSubDomain <Boolean>]
+   -Tag @{Department="Azure_devops"}
+   [-EnableHttpsTrafficOnly <Boolean>]
+   -AssignIdentity
+   [-NetworkRuleSet <PSNetworkRuleSet>]
+   [-EnableHierarchicalNamespace <Boolean>]
+   [-EnableAzureActiveDirectoryDomainServicesForFile <Boolean>]
+   [-EnableLargeFileShare]
+   [-AsJob]
+   [-EncryptionKeyTypeForTable <String>]
+   [-EncryptionKeyTypeForQueue <String>]
+   [-DefaultProfile <IAzureContextContainer>]
+   [<CommonParameters>]   
+   
+####
+
+Get-AzStorageAccount -ResourceGroupName nikunj_RG -Name nikunjsa
+
+Remove-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa -Force
+
+
+Example 1: Create a Storage account
+
+New-AzStorageAccount -ResourceGroupName nikunj_RG  -AccountName nikunjsa  -Location westus -SkuName Standard_GRS 
+
+Example 2: Create a Blob Storage account with BlobStorage Kind and hot AccessTier
+
+New-AzStorageAccount -ResourceGroupName nikunj_RG  -AccountName nikunjsa  -Location westus -SkuName Standard_GRS -Kind BlobStorage -AccessTier Hot
+
+Example 3: Create a Storage account with Kind StorageV2, and Generate and Assign an Identity for Azure KeyVault.
+
+New-AzStorageAccount -ResourceGroupName nikunj_RG  -AccountName nikunjsa  -Location westus -SkuName Standard_GRS -Kind StorageV2 -AssignIdentity
+
+Example 4: Create a Storage account with NetworkRuleSet from JSON
+
+New-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa  -Location westus -Type Standard_LRS -NetworkRuleSet (@{bypass="Logging,Metrics";
+    ipRules=(@{IPAddressOrRange="20.11.0.0/16";Action="allow"},
+            @{IPAddressOrRange="10.0.0.0/7";Action="allow"});
+    virtualNetworkRules=(@{VirtualNetworkResourceId="/subscriptions/s1/resourceGroups/g1/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1";Action="allow"},
+                        @{VirtualNetworkResourceId="/subscriptions/s1/resourceGroups/g1/providers/Microsoft.Network/virtualNetworks/vnet2/subnets/subnet2";Action="allow"});
+    defaultAction="Deny"})
+
+Example 5: Create a Storage account with Hierarchical Namespace enabled.
+
+New-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa  -Location westus -SkuName Standard_GRS -Kind StorageV2  -EnableHierarchicalNamespace $true
+
+Example 6: Create a Storage account with Azure Files AAD DS Authentication, and enable large file share.
+
+New-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa  -Location westus -SkuName Standard_LRS  -Kind StorageV2  -EnableAzureActiveDirectoryDomainServicesForFile $true -EnableLargeFileShare
+
+Example 7: Create a Blob Storage account with BlobStorage Kind and cool AccessTier
+
+New-AzStorageAccount -ResourceGroupName nikunj_RG  -AccountName nikunjsa  -Location westus -SkuName Standard_GRS -Kind BlobStorage -AccessTier cool
+
+Example 8: Create a Storage account with Queue and Table Service use account-scoped encryption key.
+
+New-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa -Location westus -SkuName Standard_LRS  -Kind StorageV2 -EncryptionKeyTypeForTable Account -EncryptionKeyTypeForQueue Account
+
+$account = get-AzStorageAccount -ResourceGroupName $rgname -StorageAccountName $accountName
+
+$account.Encryption.Services.Queue
+
+Enabled LastEnabledTime     KeyType
+------- ---------------     -------
+   True 1/9/2020 6:09:11 AM Account
+
+$account.Encryption.Services.Table
+
+Enabled LastEnabledTime     KeyType
+------- ---------------     -------
+   True 1/9/2020 6:09:11 AM Account
+
+
+
+###############
+
+Set-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa  -Tag @{Department="Azure_devops"} -AccessTier Cool
+
+Set-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa -Tag @{Department="Azure_devops"} -AccessTier Cool -UpgradeToStorageV2   
+
+Set-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa -Tag @{Department="Azure_devops"} -AccessTier Cool -UpgradeToStorageV2 -Force  
+
+Get-AzStorageAccount -ResourceGroupName nikunj_RG -Name nikunjsa
+
+Remove-AzStorageAccount -ResourceGroupName nikunj_RG -AccountName nikunjsa -Force
