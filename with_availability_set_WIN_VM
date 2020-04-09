@@ -95,7 +95,7 @@
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), variables ('subnetName'))]",
     "publicIPAddressName": "Nikunj-PublicIP",
     "numberOfInstances": 1,
-    "storageAccountName": "NikunjSA",
+    "storageAccountName": "nikunjsa1",
     "networkSecurityGroupName": "Nikunj-NSG"
   },
   "resources": [
