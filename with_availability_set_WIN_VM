@@ -42,6 +42,13 @@
         "description": "Public IP Address Name"
       }
     },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "nikunjsa",
+      "metadata": {
+        "description": "Storage Account Name"
+      }
+    },
     "vnetName": {
       "type": "string",
       "defaultValue": "Nikunj-vnet",
@@ -95,13 +102,12 @@
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), variables ('subnetName'))]",
     "publicIPAddressName": "Nikunj-PublicIP",
     "numberOfInstances": 1,
-    "storageAccountName": "nikunjsa",
     "networkSecurityGroupName": "Nikunj-NSG"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('storageAccountName')]",
+      "name": "[parameters('storageAccountName')]",
       "apiVersion": "2015-05-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
@@ -209,7 +215,7 @@
       },
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', parameters('nicNamePrefix'), copyindex())]",
         "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
       ],
@@ -246,7 +252,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": true,
-            "storageUri": "[reference(variables('storageAccountName'), '2018-02-01').primaryEndpoints.blob]"
+            "storageUri": "[reference(parameters('storageAccountName'), '2018-02-01').primaryEndpoints.blob]"
           }
         }
       }
