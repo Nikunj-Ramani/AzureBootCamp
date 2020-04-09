@@ -37,7 +37,7 @@
     },
     "publicIPAddressName": {
       "type": "string",
-      "defaultValue": "Nikunj-PublicIP",
+      "defaultValue": "NikunjPublicIP",
       "metadata": {
         "description": "Public IP Address Name"
       }
