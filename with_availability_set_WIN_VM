@@ -1,0 +1,255 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password"
+      }
+    },
+    "dnsNameforLBIP": {
+      "type": "string",
+      "defaultValue": "Nikunj-uniqueDnsNameIP",
+      "metadata": {
+        "description": "Unique DNS name"
+      }
+    },
+    "vmNamePrefix": {
+      "type": "string",
+      "defaultValue": "Nikunj-win-VM",
+      "metadata": {
+        "description": "VM name prefix"
+      }
+    },
+    "nicNamePrefix": {
+      "type": "string",
+      "defaultValue": "Nikunj-NIC",
+      "metadata": {
+        "description": "Network Interface Name Prefix"
+      }
+    },
+    "publicIPAddressName": {
+      "type": "string",
+      "defaultValue": "Nikunj-PublicIP",
+      "metadata": {
+        "description": "Public IP Address Name"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "Nikunj-vnet",
+      "metadata": {
+        "description": "VNET name"
+      }
+    },
+    "imagePublisher": {
+      "type": "string",
+      "defaultValue": "MicrosoftWindowsServer",
+      "metadata": {
+        "description": "Image Publisher"
+      }
+    },
+    "imageOffer": {
+      "type": "string",
+      "defaultValue": "WindowsServer",
+      "metadata": {
+        "description": "Image Offer"
+      }
+    },
+    "imageSKU": {
+      "type": "string",
+      "defaultValue": "2016-Datacenter",
+      "metadata": {
+        "description": "Image SKU"
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_A1",
+      "allowedValues": [
+        "Standard_A0",
+        "Standard_A1",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4"
+      ],
+      "metadata": {
+        "description": "VM Size"
+      }
+    }
+  },
+  "variables": {
+    "storageAccountType": "Standard_LRS",
+    "availabilitySetName": "myAvailabilitySet1",
+    "addressPrefix": "10.1.0.0/16",
+    "subnetName": "Subnet1",
+    "subnetPrefix": "10.1.1.0/24",
+    "publicIPAddressType": "Dynamic",
+    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), variables ('subnetName'))]",
+    "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]",
+    "numberOfInstances": 2,
+    "storageAccountName": "NikunjSA",
+    "networkSecurityGroupName": "Nikunj-nsg')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "accountType": "[variables('storageAccountType')]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('availabilitySetName')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "platformFaultDomainCount": 2,
+        "platformUpdateDomainCount": 2,
+        "managed": true
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('publicIPAddressName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsNameforLBIP')]"
+        }
+      }
+    },
+	
+    {
+      "comments": "Simple Network Security Group for subnet [variables('subnetName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('networkSecurityGroupName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {}
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('vnetName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+	
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('nicNamePrefix'), copyindex())]",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "nicLoop",
+        "count": "[variables('numberOfInstances')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+		"[concat('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]"
+      ],
+	  "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              },
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+   
+    {
+      "apiVersion": "2016-04-30-preview",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('vmNamePrefix'), copyindex())]",
+      "copy": {
+        "name": "virtualMachineLoop",
+        "count": "[variables('numberOfInstances')]"
+      },
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', parameters('nicNamePrefix'), copyindex())]",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('vmNamePrefix'), copyIndex())]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('nicNamePrefix'),copyindex()))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[reference(variables('storageAccountName'), '2018-02-01').primaryEndpoints.blob]"
+          }
+        }
+      }
+    }
+  ]
+}
