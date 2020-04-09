@@ -94,7 +94,7 @@
     "publicIPAddressType": "Dynamic",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), variables ('subnetName'))]",
     "publicIPAddressName": "Nikunj-PublicIP",
-    "numberOfInstances": 2,
+    "numberOfInstances": 1,
     "storageAccountName": "NikunjSA",
     "networkSecurityGroupName": "NikunjNSG')]"
   },
