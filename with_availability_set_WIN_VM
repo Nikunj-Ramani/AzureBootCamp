@@ -42,14 +42,7 @@
         "description": "Public IP Address Name"
       }
     },
-    "storageAccountName": {
-      "type": "string",
-      "defaultValue": "nikunjsa",
-      "metadata": {
-        "description": "Storage Account Name"
-      }
-    },
-    "vnetName": {
+      "vnetName": {
       "type": "string",
       "defaultValue": "Nikunj-vnet",
       "metadata": {
