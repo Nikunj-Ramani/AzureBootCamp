@@ -16,7 +16,7 @@
     },
     "dnsNameforLBIP": {
       "type": "string",
-      "defaultValue": "Nikunj-uniqueDnsNameIP",
+      "defaultValue": "nikunjuniquednsname",
       "metadata": {
         "description": "Unique DNS name"
       }
@@ -37,7 +37,7 @@
     },
     "publicIPAddressName": {
       "type": "string",
-      "defaultValue": "NikunjPublicIP",
+      "defaultValue": "Nikunj-PublicIP",
       "metadata": {
         "description": "Public IP Address Name"
       }
@@ -93,10 +93,10 @@
     "subnetPrefix": "10.1.1.0/24",
     "publicIPAddressType": "Dynamic",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), variables ('subnetName'))]",
-    "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]",
+    "publicIPAddressName": "Nikunj-PublicIP",
     "numberOfInstances": 2,
-    "storageAccountName": "nikunjsa",
-    "networkSecurityGroupName": "Nikunj-nsg')]"
+    "storageAccountName": "NikunjSA",
+    "networkSecurityGroupName": "NikunjNSG')]"
   },
   "resources": [
     {
