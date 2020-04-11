@@ -133,7 +133,7 @@
             "[parameters('vnetName')]"
           ],
           "properties": {
-            "addressPrefix": "[parameters('subnet1Prefix')]"
+            "addressPrefix": "[parameters('subnet2Prefix')]"
           }
         }
       ]
