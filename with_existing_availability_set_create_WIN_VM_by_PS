@@ -1,0 +1,102 @@
+## Connect to the account
+PS /home/nikunj> Connect-AzAccount
+WARNING: To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code BTLY9Y98Z to authenticate.
+
+Account                   SubscriptionName TenantId                             Environment
+-------                   ---------------- --------                             -----------
+nikunj.ramani@globant.com Free Trial       c160a942-c869-429f-8a96-f8c8296d57db AzureCloud
+
+
+PS /home/nikunj> Get-AzAvailabilitySet
+
+ResourceGroupName         : NIKUNJ_RG
+Id                        : /subscriptions/2282e3c9-124f-44be-9569-c47312f8299e/resourceGroups/NIKUNJ_RG/providers/Microsoft.Compute/availabilitySets/myAvailabilitySet
+                            1
+Name                      : myAvailabilitySet1
+Type                      : Microsoft.Compute/availabilitySets
+Location                  : westus
+Managed                   :
+Sku                       : Aligned
+Tags                      : {}
+PlatformFaultDomainCount  : 2
+PlatformUpdateDomainCount : 2
+Statuses                  : []
+VirtualMachinesReferences : [
+                              {
+                                "id":
+                            "/subscriptions/2282e3c9-124f-44be-9569-c47312f8299e/resourceGroups/NIKUNJ_RG/providers/Microsoft.Compute/virtualMachines/NIKUNJ-WIN-VM0"
+                              }
+                            ]
+ProximityPlacementGroup   :
+
+
+#Set ResourceGroup name variable
+PS C:\> $resourceGroup = "Nikunj_RG"
+
+#Set location for VM creation
+PS C:\> $location = "westus"
+
+#Set name for VM in vmName variable
+PS C:\> $vmName = "Nikunj-win-VM1"
+
+#Set name for RDP rule security group
+PS C:\> $myNetworkSecurityGroupRuleRDP = "myNetworkSecurityGroupRuleRDP"
+
+#Set name for security group
+PS C:\> $NetworkSecurityGroup = "Nikunj-nsg"
+
+#Set name for NIC 
+PS C:\> $NIC = "Nikunj-NIC1"
+
+#Set name for sku for VM
+$VM_SIZE = "Standard_A1"
+# Create user object with username and password to login this VM
+PS C:\> $cred = Get-Credential
+cmdlet Get-Credential at command pipeline position 1
+Supply values for the following parameters:
+
+#Set VirtualNetwork name variable
+PS C:\> $vnet = "Nikunj-vnet"
+
+#Get subnet configuration
+PS C:\> $subnetConfig = (Get-AzVirtualNetwork -Name $vnet | Get-AzVirtualNetworkSubnetConfig).Id
+
+# Create a public IP address and specify a DNS name
+PS C:\> $pip = New-AzPublicIpAddress -ResourceGroupName $resourceGroup -Location $location `
+  -Name "mypublicdns$(Get-Random)" -AllocationMethod Static -IdleTimeoutInMinutes 4
+
+# Create an inbound network security group rule for port 3389
+PS C:\> $nsgRuleRDP = New-AzNetworkSecurityRuleConfig -Name $myNetworkSecurityGroupRuleRDP  -Protocol Tcp `
+  -Direction Inbound -Priority 1000 -SourceAddressPrefix * -SourcePortRange * -DestinationAddressPrefix * `
+  -DestinationPortRange 3389 -Access Allow
+
+# Create a network security group
+PS C:\> $nsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Location $location `
+  -Name $NetworkSecurityGroup -SecurityRules $nsgRuleRDP
+
+# Create a virtual network card and associate with public IP address and NSG
+PS C:\> $nic = New-AzNetworkInterface -Name $NIC -ResourceGroupName $resourceGroup -Location $location `
+  -SubnetId $subnetConfig -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.Id
+
+# Get availabilityset id
+PS C:\> $availabilitySet = (Get-AzAvailabilitySet -ResourceGroupName $resourceGroup).Id
+
+# Create a virtual machine configuration
+PS C:\> $vmConfig = New-AzVMConfig -VMName $vmName -VMSize $VM_SIZE -AvailabilitySetId $availabilitySet | `
+Set-AzVMOperatingSystem -Windows -ComputerName $vmName -Credential $cred | `
+Set-AzVMSourceImage -PublisherName MicrosoftWindowsServer -Offer WindowsServer -Skus 2016-Datacenter -Version latest | `
+Add-AzVMNetworkInterface -Id $nic.Id
+
+# Create a virtual machine
+PS C:\> New-AzVM -ResourceGroupName $resourceGroup -Location $location -VM $vmConfig
+WARNING: Since the VM is created using premium storage or managed disk, existing standard storage account, nikunjsa, is used for boot diagnostics.
+
+RequestId IsSuccessStatusCode StatusCode ReasonPhrase
+--------- ------------------- ---------- ------------
+                         True         OK OK          
+
+
+PS C:\> 
+
+##############################
+Reference : https://docs.microsoft.com/en-us/azure/virtual-machines/scripts/virtual-machines-windows-powershell-sample-create-vm?toc=/azure/virtual-machines/windows/toc.json
