@@ -93,9 +93,7 @@ WARNING: Since the VM is created using premium storage or managed disk, existing
 
 RequestId IsSuccessStatusCode StatusCode ReasonPhrase
 --------- ------------------- ---------- ------------
-                         True         OK OK          
-
-
+                         True         OK OK
 PS C:\> 
 
 ##############################
