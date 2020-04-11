@@ -1,0 +1,276 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "Nikunj-vnet",
+      "metadata": {
+        "description": "VNet name"
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.1.0.0/16",
+      "metadata": {
+        "description": "Address prefix"
+      }
+    },
+    "subnet2Prefix": {
+      "type": "string",
+      "defaultValue": "10.1.2.0/24",
+      "metadata": {
+        "description": "Subnet 2 Prefix"
+      }
+    },
+    "subnet2Name": {
+      "type": "string",
+      "defaultValue": "Subnet2",
+      "metadata": {
+        "description": "Subnet 2 Name"
+      }
+    },
+	"networkInterfaceName": {
+            "type": "string",
+			"defaultValue": "Nikunj-NIC"
+        },
+	"networkSecurityGroupName": {
+	  "type": "string",
+	  "defaultValue": "Nikunj-Lin-NSG",
+	  "metadata": {
+        "description": "Network Security Group Name"
+      }
+	},
+	"publicIpAddressName": {
+	  "type": "string",
+	  "defaultValue": "mypublicdnslinux",
+	  "metadata": {
+        "description": "Public IP address Name"
+      }
+	},
+	"publicIpAddressType": {
+	  "type": "string",
+	  "defaultValue": "Dynamic",
+	  "metadata": {
+        "description": "Public IP address type"
+		}
+	},
+	"publicIpAddressSku": {
+	  "type": "string",
+	  "defaultValue": "Basic",
+	  "metadata": {
+        "description": "Public IP address sku"
+		}
+	},
+    "availabilitySetName": {
+        "type": "string",
+        "defaultValue": "LinuxAvilabilitySet"
+    },
+    "availabilitySetPlatformFaultDomainCount": {
+        "type": "int",
+        "defaultValue": 2
+    },
+    "availabilitySetPlatformUpdateDomainCount": {
+        "type": "int",
+        "defaultValue": 5
+    },
+    "numberOfVMs": {
+        "type": "int",
+        "defaultValue": 2
+    },
+    "virtualMachineName": {
+        "type": "string",
+        "defaultValue": "LinuxVM"
+    },
+    "virtualMachineSize": {
+        "type": "string",
+        "defaultValue": "Standard_A2"
+    },
+    "osDiskType": {
+        "type": "string",
+        "defaultValue": "StandardSSD_LRS"
+    },
+    "adminUsername": {
+        "type": "string",
+        "defaultValue": "ubuntu"
+    },
+    "adminPassword": {
+        "type": "securestring"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    }
+  },
+  "variables": {
+      "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
+      "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+      "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnet2Name'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2018-10-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('vnetName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressPrefix')]"
+          ]
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2018-10-01",
+          "type": "subnets",
+          "location": "[parameters('location')]",
+          "name": "[parameters('subnet2Name')]",
+          "dependsOn": [
+            "[parameters('vnetName')]"
+          ],
+          "properties": {
+            "addressPrefix": "[parameters('subnet1Prefix')]"
+          }
+        }
+      ]
+    },
+	{
+     "type": "Microsoft.Network/networkSecurityGroups",
+     "apiVersion": "2019-02-01",
+     "name": "[parameters('networkSecurityGroupName')]",
+     "location": "[parameters('location')]",
+     "properties": {
+         "securityRules": [
+             {
+                 "name": "SSH",
+                 "properties": {
+                     "priority": 1000,
+                     "protocol": "TCP",
+                     "access": "Allow",
+                     "direction": "Inbound",
+                     "sourceAddressPrefix": "*",
+                     "sourcePortRange": "*",
+                     "destinationAddressPrefix": "*",
+                     "destinationPortRange": "22"
+                 }
+             }
+         ]
+            }
+        },
+	{
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2018-08-01",
+            "name": "[concat(parameters('publicIpAddressName'), copyindex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "publicIpAddressesLoop",
+                "count": "[parameters('numberOfVMs')]"
+                },
+            "properties": {
+                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+            },
+            "sku": {
+                "name": "[parameters('publicIpAddressSku')]"
+            }
+    },
+	{
+            "name": "[concat(parameters('networkInterfaceName'), copyindex())]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+             "copy": {
+                "name": "networkInterfaceLoop",
+                "count": "[parameters('numberOfVMs')]"
+                },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName'), copyindex())]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('publicIpAddressName'), copyindex()))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgId')]"
+                }
+            }
+        },
+        {
+            "name": "[parameters('availabilitySetName')]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "platformFaultDomainCount": "[parameters('availabilitySetPlatformFaultDomainCount')]",
+                "platformUpdateDomainCount": "[parameters('availabilitySetPlatformUpdateDomainCount')]"
+            },
+            "sku": {
+                "name": "Aligned"
+            }
+        },
+        {
+            "name": "[concat(parameters('virtualMachineName'), copyindex())]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "virtualMachinesLoop",
+                "count": "[parameters('numberOfVMs')]"
+      },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'), copyindex())]",
+                "[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "18.04-LTS",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('networkInterfaceName'), copyindex()))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('virtualMachineName'), copyindex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+                }
+            }
+        }
+  ]
+}
