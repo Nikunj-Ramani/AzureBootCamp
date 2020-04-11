@@ -1,0 +1,26 @@
+PS /home/nikunj> Get-AzStorageAccount
+
+StorageAccountName ResourceGroupName PrimaryLocation SkuName      Kind      AccessTier CreationTime         ProvisioningState EnableHttpsTrafficOnly LargeFileShares
+------------------ ----------------- --------------- -------      ----      ---------- ------------         ----------------- ---------------------- ---------------
+nikunjsa           Nikunj_RG         westus          Standard_LRS StorageV2 Hot        4/9/2020 12:19:38 PM Succeeded         True
+xmwkmtc7h2cxy      Nikunj_RG         westus          Standard_LRS Storage              4/11/2020 7:29:37 AM Succeeded         False
+
+PS /home/nikunj> $resourceGroup = "Nikunj_RG1"
+
+PS /home/nikunj> $storageaccountname = "sanikunj"
+
+PS /home/nikunj> $location = "westus"
+
+PS /home/nikunj> New-AzStorageAccount -ResourceGroupName $resourceGroup -AccountName $storageaccountname -Location $location -SkuName Standard_LRS -Kind BlobStorage -AccessTier Cool
+
+StorageAccountName ResourceGroupName PrimaryLocation SkuName      Kind        AccessTier CreationTime         ProvisioningState EnableHttpsTrafficOnly LargeFileShares
+------------------ ----------------- --------------- -------      ----        ---------- ------------         ----------------- ---------------------- ---------------
+sanikunj           Nikunj_RG1        westus          Standard_LRS BlobStorage Cool       4/11/2020 5:42:29 PM Succeeded         True
+
+PS /home/nikunj>
+PS /home/nikunj> Get-AzStorageAccount
+StorageAccountName ResourceGroupName PrimaryLocation SkuName      Kind        AccessTier CreationTime         ProvisioningState EnableHttpsTrafficOnly LargeFileShares
+------------------ ----------------- --------------- -------      ----        ---------- ------------         ----------------- ---------------------- ---------------
+nikunjsa           Nikunj_RG         westus          Standard_LRS StorageV2   Hot        4/9/2020 12:19:38 PM Succeeded         True
+sanikunj           Nikunj_RG1        westus          Standard_LRS BlobStorage Cool       4/11/2020 5:42:29 PM Succeeded         True
+xmwkmtc7h2cxy      Nikunj_RG         westus          Standard_LRS Storage                4/11/2020 7:29:37 AM Succeeded         False
