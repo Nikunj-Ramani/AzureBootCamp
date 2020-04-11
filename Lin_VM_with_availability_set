@@ -84,7 +84,7 @@
     },
     "virtualMachineSize": {
         "type": "string",
-        "defaultValue": "Standard_A2"
+        "defaultValue": "Standard_D1"
     },
     "osDiskType": {
         "type": "string",
