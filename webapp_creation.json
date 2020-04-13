@@ -3,46 +3,46 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "subscriptionId": {
-            "type": "string"
+            "value": "2282e3c9-124f-44be-9569-c47312f8299e"
         },
         "name": {
-            "type": "string"
+            "value": "Nikunj-webapp"
         },
         "location": {
-            "type": "string"
+            "value": "Central US"
         },
         "hostingEnvironment": {
-            "type": "string"
+            "value": ""
         },
         "hostingPlanName": {
-            "type": "string"
+            "value": "ASP-Nikunj-webapp"
         },
         "serverFarmResourceGroup": {
-            "type": "string"
+            "value": "Nikunj_RG1"
         },
         "alwaysOn": {
-            "type": "bool"
+            "value": true
         },
         "sku": {
-            "type": "string"
+            "value": "Standard"
         },
         "skuCode": {
-            "type": "string"
+            "value": "S1"
         },
         "workerSize": {
-            "type": "string"
+            "value": "0"
         },
         "workerSizeId": {
-            "type": "string"
+            "value": "0"
         },
         "numberOfWorkers": {
-            "type": "string"
+            "value": "1"
         },
         "currentStack": {
-            "type": "string"
+            "value": "dotnetcore"
         },
         "errorLink": {
-            "type": "string"
+            "value": "https://Nikunj-webapp.scm.azurewebsites.net/detectors?type=tools&name=eventviewer"
         }
     },
     "resources": [
