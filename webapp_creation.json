@@ -3,46 +3,46 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "subscriptionId": {
-            "value": "2282e3c9-124f-44be-9569-c47312f8299e"
+            "defaultValue": "2282e3c9-124f-44be-9569-c47312f8299e"
         },
         "name": {
-            "value": "Nikunj-webapp"
+            "defaultValue": "Nikunj-webapp"
         },
         "location": {
-            "value": "Central US"
+            "defaultValue": "Central US"
         },
         "hostingEnvironment": {
-            "value": ""
+            "defaultValue": ""
         },
         "hostingPlanName": {
-            "value": "ASP-Nikunj-webapp"
+            "defaultValue": "ASP-Nikunj-webapp"
         },
         "serverFarmResourceGroup": {
-            "value": "Nikunj_RG1"
+            "defaultValue": "Nikunj_RG1"
         },
         "alwaysOn": {
-            "value": true
+            "defaultValue": true
         },
         "sku": {
-            "value": "Standard"
+            "defaultValue": "Standard"
         },
         "skuCode": {
-            "value": "S1"
+            "defaultValue": "S1"
         },
         "workerSize": {
-            "value": "0"
+            "defaultValue": "0"
         },
         "workerSizeId": {
-            "value": "0"
+            "defaultValue": "0"
         },
         "numberOfWorkers": {
-            "value": "1"
+            "defaultValue": "1"
         },
         "currentStack": {
-            "value": "dotnetcore"
+            "defaultValue": "dotnetcore"
         },
         "errorLink": {
-            "value": "https://Nikunj-webapp.scm.azurewebsites.net/detectors?type=tools&name=eventviewer"
+            "defaultValue": "https://Nikunj-webapp.scm.azurewebsites.net/detectors?type=tools&name=eventviewer"
         }
     },
     "resources": [
