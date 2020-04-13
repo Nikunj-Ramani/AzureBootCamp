@@ -47,7 +47,7 @@
         }
     },
     "variables": {
-        "vnetId": "[resourceId('Nikunj_RG1','Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "vnetId": "[resourceId('Nikunj_RG_ALB_webapp','Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
         "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]",
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
         "applicationGatewayId": "[resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName'))]"
@@ -99,11 +99,11 @@
                 ],
                 "backendAddressPools": [
                     {
-                        "name": "ALB-webapp-alb",
+                        "name": "ALB-webapp-backend",
                         "properties": {
                             "backendAddresses": [
                                 {
-                                    "fqdn": "websitek3hamns6zb3hy.azurewebsites.net"
+                                    "fqdn": "alb-webapp.azurewebsites.net"
                                 }
                             ]
                         }
@@ -111,7 +111,7 @@
                 ],
                 "backendHttpSettingsCollection": [
                     {
-                        "name": "ALB-webapp-routing-http",
+                        "name": "ALB-webapp-backend-http",
                         "properties": {
                             "Port": 80,
                             "Protocol": "Http",
@@ -137,17 +137,17 @@
                 ],
                 "requestRoutingRules": [
                     {
-                        "Name": "ALB-webapp-routing",
+                        "Name": "ALB-webapp-routing-connectivity",
                         "properties": {
                             "RuleType": "Basic",
                             "httpListener": {
                                 "id": "[concat(variables('applicationGatewayId'), '/httpListeners/ALB-webapp-listner')]"
                             },
                             "backendAddressPool": {
-                                "id": "[concat(variables('applicationGatewayId'), '/backendAddressPools/ALB-webapp-alb')]"
+                                "id": "[concat(variables('applicationGatewayId'), '/backendAddressPools/ALB-webapp-backend')]"
                             },
                             "backendHttpSettings": {
-                                "id": "[concat(variables('applicationGatewayId'), '/backendHttpSettingsCollection/ALB-webapp-routing-http')]"
+                                "id": "[concat(variables('applicationGatewayId'), '/backendHttpSettingsCollection/ALB-webapp-backend-http')]"
                             }
                         }
                     }
