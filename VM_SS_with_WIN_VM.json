@@ -1,0 +1,255 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westus2"
+        },
+        "virtualMachineScaleSetName": {
+            "value": "iis-VMSS"
+        },
+        "virtualMachineScaleSetRG": {
+            "value": "Nikunj_iis_RG"
+        },
+        "singlePlacementGroup": {
+            "value": "true"
+        },
+        "instanceSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "instanceCount": {
+            "value": "2"
+        },
+        "upgradeMode": {
+            "value": "Manual"
+        },
+        "priority": {
+            "value": "Regular"
+        },
+        "enableAcceleratedNetworking": {
+            "value": "false"
+        },
+        "subnetId": {
+            "value": "/subscriptions/cf2deb86-affb-4ba9-8848-ec9428335fa2/resourceGroups/cczTest/providers/Microsoft.Network/virtualNetworks/cczTest-vnet/subnets/default"
+        },
+        "osDiskType": {
+            "value": "StandardSSD_LRS"
+        },
+        "addressPrefixes": {
+            "value": [
+                "10.2.0.0/24"
+            ]
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "default",
+                    "properties": {
+                        "addressPrefix": "10.2.0.0/24"
+                    }
+                }
+            ]
+        },
+        "virtualNetworkId": {
+            "value": "/subscriptions/2282e3c9-124f-44be-9569-c47312f8299e/resourceGroups/Nikunj_iis_RG/providers/Microsoft.Network/virtualNetworks/Nikunj_iis_RG-vnet"
+        },
+        "virtualNetworkName": {
+            "value": "Nikunj_iis_RG-vnet"
+        },
+        "networkSecurityGroups": {
+            "value": [
+                {
+                    "name": "basicNsgNikunj_iis_RG-vnet-nic01",
+                    "id": "/subscriptions/2282e3c9-124f-44be-9569-c47312f8299e/resourceGroups/Nikunj_iis_RG/providers/Microsoft.Network/networkSecurityGroups/basicNsgNikunj_iis_RG-vnet-nic01",
+                    "rules": []
+                }
+            ]
+        },
+        "networkInterfaceConfigurations": {
+            "value": [
+                {
+                    "name": "Nikunj_iis_RG-vnet-nic01",
+                    "primary": true,
+                    "subnetId": "/subscriptions/2282e3c9-124f-44be-9569-c47312f8299e/resourceGroups/Nikunj_iis_RG/providers/Microsoft.Network/virtualNetworks/Nikunj_iis_RG-vnet/subnets/default",
+                    "applicationGatewayBackendAddressPools": [],
+                    "loadBalancerBackendAddressPools": [],
+                    "applicationSecurityGroups": [],
+                    "loadBalancerInboundNatPools": [],
+                    "enableAcceleratedNetworking": false,
+                    "nsgName": "basicNsgNikunj_iis_RG-vnet-nic01",
+                    "nsgId": "/subscriptions/2282e3c9-124f-44be-9569-c47312f8299e/resourceGroups/Nikunj_iis_RG/providers/Microsoft.Network/networkSecurityGroups/basicNsgNikunj_iis_RG-vnet-nic01",
+                    "pipName": ""
+                }
+            ]
+        },
+        "vmName": {
+            "value": "iis-VMSS"
+        },
+        "scaleInPolicy": {
+            "value": {
+                "rules": [
+                    "Default"
+                ]
+            }
+        },
+        "diagnosticStorageAccount": {
+            "value": "nikunjiisrgdiag"
+        },
+        "diagnosticsStorageAccountKind": {
+            "value": "Storage"
+        },
+        "diagnosticsStorageAccountType": {
+            "value": "Standard_LRS"
+        },
+        "upgradePolicy": {
+            "value": "Manual"
+        },
+        "adminUsername": {
+            "value": "ubuntuadmin"
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "platformFaultDomainCount": {
+            "value": "5"
+        }
+    }
+},
+    "variables": {
+        "storageApiVersion": "2019-06-01",
+        "namingInfix": "[toLower(substring(concat(parameters('virtualMachineScaleSetName'), uniqueString(resourceGroup().id)), 0, 9))]"
+    },
+    "resources": [
+        {
+            "name": "[parameters('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-09-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[parameters('addressPrefixes')]"
+                },
+                "subnets": "[parameters('subnets')]"
+            }
+        },
+        {
+            "name": "[parameters('networkSecurityGroups')[copyIndex()].name]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": "[parameters('networkSecurityGroups')[copyIndex()].rules]"
+            },
+            "copy": {
+                "name": "networkSecurityGroups",
+                "count": "[length(parameters('networkSecurityGroups'))]"
+            }
+        },
+        {
+            "name": "[parameters('diagnosticStorageAccount')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "location": "[parameters('location')]",
+            "properties": {},
+            "sku": {
+                "name": "[parameters('diagnosticsStorageAccountType')]"
+            },
+            "kind": "[parameters('diagnosticsStorageAccountKind')]"
+        },
+        {
+            "name": "[parameters('virtualMachineScaleSetName')]",
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "networkSecurityGroups",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('diagnosticStorageAccount'))]"
+            ],
+            "sku": {
+                "name": "[parameters('instanceSize')]",
+                "tier": "Standard",
+                "capacity": "[int(parameters('instanceCount'))]"
+            },
+            "properties": {
+                "overprovision": "true",
+                "upgradePolicy": {
+                    "mode": "[parameters('upgradePolicy')]"
+                },
+                "singlePlacementGroup": "[parameters('singlePlacementGroup')]",
+                "virtualMachineProfile": {
+                    "storageProfile": {
+                        "osDisk": {
+                            "createOption": "fromImage",
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "[parameters('osDiskType')]"
+                            }
+                        },
+                        "imageReference": {
+                            "publisher": "Canonical",
+                            "offer": "UbuntuServer",
+                            "sku": "18.04-LTS",
+                            "version": "latest"
+                        }
+                    },
+                    "priority": "[parameters('priority')]",
+                    "networkProfile": {
+                        "copy": [
+                            {
+                                "name": "networkInterfaceConfigurations",
+                                "count": "[length(parameters('networkInterfaceConfigurations'))]",
+                                "input": {
+                                    "name": "[parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].name]",
+                                    "properties": {
+                                        "primary": "[parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].primary]",
+                                        "enableAcceleratedNetworking": "[parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].enableAcceleratedNetworking]",
+                                        "ipConfigurations": [
+                                            {
+                                                "name": "[concat(parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].name, '-defaultIpConfiguration')]",
+                                                "properties": {
+                                                    "subnet": {
+                                                        "id": "[parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].subnetId]"
+                                                    },
+                                                    "primary": "[parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].primary]",
+                                                    "applicationGatewayBackendAddressPools": "[parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].applicationGatewayBackendAddressPools]",
+                                                    "loadBalancerBackendAddressPools": "[parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].loadBalancerBackendAddressPools]",
+                                                    "loadBalancerInboundNatPools": "[parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].loadBalancerInboundNatPools]",
+                                                    "publicIPAddressConfiguration": "[if( equals( parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].pipName, ''), json('null'), union(json(concat('{\"name\": \"', parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].pipName, '\"}'))\n                        ,json('{\"properties\": { \"idleTimeoutInMinutes\": 15}}')))]"
+                                                }
+                                            }
+                                        ],
+                                        "networkSecurityGroup": "[if( equals( parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].nsgId, ''), json('null'),json(concat('{\"id\": \"', parameters('networkInterfaceConfigurations')[copyIndex('networkInterfaceConfigurations')].nsgId, '\"}')))]"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "extensionProfile": {
+                        "extensions": []
+                    },
+                    "diagnosticsProfile": {
+                        "bootDiagnostics": {
+                            "enabled": true,
+                            "storageUri": "[reference(parameters('diagnosticStorageAccount'), variables('storageApiVersion')).primaryEndpoints.blob]"
+                        }
+                    },
+                    "osProfile": {
+                        "computerNamePrefix": "[variables('namingInfix')]",
+                        "adminUsername": "[parameters('adminUsername')]",
+                        "adminPassword": "[parameters('adminPassword')]"
+                    }
+                },
+                "scaleInPolicy": "[parameters('scaleInPolicy')]",
+                "platformFaultDomainCount": "[parameters('platformFaultDomainCount')]"
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}
